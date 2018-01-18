@@ -5,7 +5,18 @@ jc
 
 Use it like this:
 
-`curl "https://data.nasa.gov/resource/y77d-th95.json" | jc`
+`cat ./a_bunch_of_line_delim.json | jc`
+
+Or, like this:
+
+``` sh
+$ jc
+{"foo":{"bar":1}}
+{"foo":{"bar":2}}
+{"foo":{"bar":[3,4,5]}}
+<CTRL+D>
+{"foo.bar":5}
+```
 
 Build it like this:
 
