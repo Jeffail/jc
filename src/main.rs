@@ -36,17 +36,15 @@ fn main() {
     let (sdone, rdone) = chan::sync(0);
 
     if matches.is_present("hll") {
-        // Run work.
         thread::spawn(move || run_hll(sdone));
     } else {
-        // Run work.
         thread::spawn(move || run(sdone));
     }
 
     // Wait for a signal or for work to be done.
     chan_select! {
         signal.recv() -> signal => {
-            println!("Received signal: {:?}, shutting down...", signal.unwrap())
+            eprintln!("Received signal: {:?}, shutting down...", signal.unwrap())
         },
         rdone.recv() => {}
     }
@@ -108,7 +106,7 @@ fn map_value(path: String, map: &mut HashMap<String, HashSet<JValue>>, val: JVal
         }
         JValue::Array(a) => for ele in a {
             map_value(path.clone(), map, ele);
-        }
+        },
         JValue::Object(o) => for (next, ele) in o {
             let mut new_path = path.clone();
             if new_path.len() == 0 {
@@ -117,7 +115,7 @@ fn map_value(path: String, map: &mut HashMap<String, HashSet<JValue>>, val: JVal
                 new_path = [new_path, next].join(".");
             }
             map_value(new_path, map, ele);
-        }
+        },
     }
 }
 
@@ -130,7 +128,7 @@ fn run(_sdone: chan::Sender<()>) {
         let val = match serde_json::from_str::<JValue>(&line.unwrap()) {
             Ok(v) => v,
             Err(e) => {
-                println!("Error parsing JSON: {:?}", e);
+                eprintln!("Error parsing JSON: {:?}", e);
                 continue;
             }
         };
@@ -190,7 +188,7 @@ fn map_value_hll(path: String, map: &mut HashMap<String, HyperLogLog<String>>, v
         }
         HLLValue::Array(a) => for ele in a {
             map_value_hll(path.clone(), map, ele);
-        }
+        },
         HLLValue::Object(o) => for (next, ele) in o {
             let mut new_path = path.clone();
             if new_path.len() == 0 {
@@ -199,7 +197,7 @@ fn map_value_hll(path: String, map: &mut HashMap<String, HyperLogLog<String>>, v
                 new_path = [new_path, next].join(".");
             }
             map_value_hll(new_path, map, ele);
-        }
+        },
     }
 }
 
@@ -212,7 +210,7 @@ fn run_hll(_sdone: chan::Sender<()>) {
         let val = match serde_json::from_str::<HLLValue>(&line.unwrap()) {
             Ok(v) => v,
             Err(e) => {
-                println!("Error parsing JSON: {:?}", e);
+                eprintln!("Error parsing JSON: {:?}", e);
                 continue;
             }
         };
